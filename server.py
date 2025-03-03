@@ -1,3 +1,4 @@
+
 import os
 import json
 from flask import Flask, request, jsonify, render_template, send_from_directory
@@ -5,7 +6,10 @@ from flask import Flask, request, jsonify, render_template, send_from_directory
 # Import the agent initialization from chatbot.py
 from chatbot import initialize_agent, HumanMessage
 
-from api.index import app
+# Create Flask app
+app = Flask(__name__, 
+            static_folder='static',
+            template_folder='.')
 
 # Initialize AgentKit
 agent_executor, config = initialize_agent()
@@ -23,7 +27,7 @@ def serve_static(path):
 @app.route('/status', methods=['GET'])
 def status():
     """API endpoint to check server status"""
-    return jsonify({"status": "AgentKit is running"}), 200
+    return jsonify({"status": "AgentKit is running", "message": "Hello from VinRouge-Dexy-Bot! The server is working correctly."}), 200
 
 @app.route('/query', methods=['POST'])
 def query():
@@ -124,15 +128,6 @@ def wallet():
             return jsonify({"error": "Invalid wallet data format"}), 500
     else:
         return jsonify({"error": "No wallet data found"}), 404
-
-# Handler for Vercel serverless deployment
-def handler(request, context):
-    """
-    This function is used by Vercel to handle serverless requests.
-    It forwards the request to the Flask app.
-    """
-    with app.request_context(request):
-        return app.full_dispatch_request()
 
 if __name__ == "__main__":
     # Bind to 0.0.0.0 to make the server accessible from outside
