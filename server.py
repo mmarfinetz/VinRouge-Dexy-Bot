@@ -19,10 +19,21 @@ def index():
     """Serve the main UI page"""
     return render_template('index.html')
 
+# Additional route to ensure index.html is served when accessed directly
+@app.route('/index.html')
+def index_html():
+    """Serve the main UI page"""
+    return render_template('index.html')
+
 @app.route('/static/<path:path>')
 def serve_static(path):
     """Serve static files"""
     return send_from_directory('static', path)
+
+@app.route('/favicon.ico')
+def favicon():
+    """Serve favicon"""
+    return send_from_directory('static/img', 'w95_27.png')
 
 @app.route('/status', methods=['GET'])
 def status():

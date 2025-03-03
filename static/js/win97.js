@@ -3052,3 +3052,688 @@ function parseAnalysisText(text) {
     
     return sections;
 }
+// Windows 97 Style UI Implementation
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize UI elements
+    updateClock();
+    setInterval(updateClock, 60000);
+    
+    // Show the chat window by default
+    setTimeout(() => {
+        openWindow('chat-window');
+    }, 500);
+    
+    // Start menu toggle
+    document.getElementById('start-button').addEventListener('click', toggleStartMenu);
+    
+    // Close start menu when clicking elsewhere
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('#start-menu') && !e.target.closest('#start-button')) {
+            document.getElementById('start-menu').style.display = 'none';
+        }
+    });
+    
+    // Make windows draggable
+    makeWindowsDraggable();
+});
+
+// Make windows draggable
+function makeWindowsDraggable() {
+    const windows = document.querySelectorAll('.window');
+    
+    windows.forEach(window => {
+        const titleBar = window.querySelector('.title-bar');
+        
+        let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+        
+        if (titleBar) {
+            titleBar.onmousedown = dragMouseDown;
+        }
+        
+        function dragMouseDown(e) {
+            e.preventDefault();
+            // Get the mouse cursor position at startup
+            pos3 = e.clientX;
+            pos4 = e.clientY;
+            document.onmouseup = closeDragElement;
+            // Call a function whenever the cursor moves
+            document.onmousemove = elementDrag;
+            
+            // Bring window to front
+            bringToFront(window);
+        }
+        
+        function elementDrag(e) {
+            e.preventDefault();
+            // Calculate the new cursor position
+            pos1 = pos3 - e.clientX;
+            pos2 = pos4 - e.clientY;
+            pos3 = e.clientX;
+            pos4 = e.clientY;
+            // Set the element's new position
+            window.style.top = (window.offsetTop - pos2) + "px";
+            window.style.left = (window.offsetLeft - pos1) + "px";
+        }
+        
+        function closeDragElement() {
+            // Stop moving when mouse button is released
+            document.onmouseup = null;
+            document.onmousemove = null;
+        }
+    });
+}
+
+// Window Management Functions
+function openWindow(windowId) {
+    // Play click sound
+    playSound('click-sound');
+    
+    const window = document.getElementById(windowId);
+    window.style.display = 'block';
+    
+    // Bring this window to front
+    bringToFront(window);
+    
+    // Add to taskbar if not already there
+    addToTaskbar(windowId);
+}
+
+function closeWindow(windowId) {
+    // Play click sound
+    playSound('click-sound');
+    
+    document.getElementById(windowId).style.display = 'none';
+    
+    // Remove from taskbar
+    removeFromTaskbar(windowId);
+}
+
+function minimizeWindow(windowId) {
+    // Play click sound
+    playSound('click-sound');
+    
+    document.getElementById(windowId).style.display = 'none';
+}
+
+function toggleMaximize(windowId) {
+    // Play click sound
+    playSound('click-sound');
+    
+    const window = document.getElementById(windowId);
+    
+    if (window.classList.contains('maximized')) {
+        // Restore window
+        window.classList.remove('maximized');
+    } else {
+        // Maximize window
+        window.classList.add('maximized');
+    }
+}
+
+function bringToFront(window) {
+    // Set z-index for all windows to base value
+    document.querySelectorAll('.window').forEach(w => {
+        w.style.zIndex = "10";
+    });
+    
+    // Set target window to higher z-index
+    window.style.zIndex = "20";
+}
+
+// Taskbar Management
+function addToTaskbar(windowId) {
+    const taskbarEntries = document.getElementById('taskbar-entries');
+    
+    // Check if entry already exists
+    if (!document.querySelector(`.taskbar-entry[data-window="${windowId}"]`)) {
+        const windowElement = document.getElementById(windowId);
+        const windowTitle = windowElement.querySelector('.title-bar-text').textContent.trim();
+        
+        const entry = document.createElement('div');
+        entry.className = 'taskbar-entry';
+        entry.setAttribute('data-window', windowId);
+        entry.innerHTML = windowTitle;
+        
+        entry.addEventListener('click', () => {
+            const window = document.getElementById(windowId);
+            if (window.style.display === 'none') {
+                window.style.display = 'block';
+                bringToFront(window);
+            } else {
+                window.style.display = 'none';
+            }
+        });
+        
+        taskbarEntries.appendChild(entry);
+    }
+}
+
+function removeFromTaskbar(windowId) {
+    const entry = document.querySelector(`.taskbar-entry[data-window="${windowId}"]`);
+    if (entry) {
+        entry.remove();
+    }
+}
+
+// Start Menu
+function toggleStartMenu() {
+    // Play click sound
+    playSound('click-sound');
+    
+    const startMenu = document.getElementById('start-menu');
+    startMenu.style.display = startMenu.style.display === 'block' ? 'none' : 'block';
+}
+
+// Chat functionality
+function sendMessage() {
+    const inputElement = document.getElementById('chat-input');
+    const messagesElement = document.getElementById('chat-messages');
+    const message = inputElement.value.trim();
+    
+    if (message === '') {
+        return;
+    }
+    
+    // Add user message to chat
+    const userMessageElement = document.createElement('div');
+    userMessageElement.className = 'chat-message user';
+    userMessageElement.innerHTML = `
+        <div class="message-content">
+            <div class="message-text">
+                <p>${message}</p>
+            </div>
+        </div>
+    `;
+    messagesElement.appendChild(userMessageElement);
+    
+    // Clear input
+    inputElement.value = '';
+    
+    // Scroll to bottom
+    messagesElement.scrollTop = messagesElement.scrollHeight;
+    
+    // Show thinking indicator
+    const thinkingElement = document.createElement('div');
+    thinkingElement.className = 'chat-message system thinking';
+    thinkingElement.innerHTML = `
+        <div class="message-content">
+            <img src="static/img/w95_27.png" class="bot-avatar">
+            <div class="message-text">
+                <p>Thinking...</p>
+            </div>
+        </div>
+    `;
+    messagesElement.appendChild(thinkingElement);
+    
+    // Send message to server
+    fetch('/query', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ message: message }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Remove thinking indicator
+        messagesElement.removeChild(thinkingElement);
+        
+        // Add bot response to chat
+        const botMessageElement = document.createElement('div');
+        botMessageElement.className = 'chat-message system';
+        botMessageElement.innerHTML = `
+            <div class="message-content">
+                <img src="static/img/w95_27.png" class="bot-avatar">
+                <div class="message-text">
+                    <p>${data.response}</p>
+                </div>
+            </div>
+        `;
+        messagesElement.appendChild(botMessageElement);
+        
+        // Scroll to bottom
+        messagesElement.scrollTop = messagesElement.scrollHeight;
+        
+        // Play notification sound
+        playSound('notify-sound');
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        
+        // Remove thinking indicator
+        messagesElement.removeChild(thinkingElement);
+        
+        // Add error message
+        const errorMessageElement = document.createElement('div');
+        errorMessageElement.className = 'chat-message system error';
+        errorMessageElement.innerHTML = `
+            <div class="message-content">
+                <img src="static/img/w95_27.png" class="bot-avatar">
+                <div class="message-text">
+                    <p>Sorry, an error occurred. Please try again.</p>
+                </div>
+            </div>
+        `;
+        messagesElement.appendChild(errorMessageElement);
+        
+        // Play error sound
+        playSound('error-sound');
+    });
+}
+
+// Analysis Tab Functions
+function showTab(tabId) {
+    // Hide all tab panes
+    document.querySelectorAll('.tab-pane').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    
+    // Show selected tab pane
+    document.getElementById(tabId).classList.add('active');
+    
+    // Update tab buttons
+    document.querySelectorAll('.tab-button').forEach(button => {
+        button.classList.remove('active');
+    });
+    
+    // Find and activate the button that called this function
+    document.querySelector(`.tab-button[onclick="showTab('${tabId}')"]`).classList.add('active');
+}
+
+// Help Tab Functions
+function showHelpTab(tabId) {
+    // Hide all help tab contents
+    document.querySelectorAll('.help-tab-content').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    
+    // Show selected help tab content
+    document.getElementById(tabId).classList.add('active');
+    
+    // Update sidebar items
+    document.querySelectorAll('.help-sidebar-item').forEach(item => {
+        item.classList.remove('active');
+    });
+    
+    // Find and activate the sidebar item
+    document.querySelector(`.help-sidebar-item[onclick="showHelpTab('${tabId}')"]`).classList.add('active');
+}
+
+// Analysis Functions
+function runQuickAnalysis() {
+    const tokenSelect = document.getElementById('quick-token');
+    const token = tokenSelect.value;
+    const resultsContainer = document.getElementById('quick-analysis-results');
+    const loadingIndicator = document.getElementById('quick-analysis-loading');
+    
+    // Show loading indicator
+    resultsContainer.innerHTML = '';
+    loadingIndicator.style.display = 'flex';
+    
+    // Send request to server
+    fetch('/analyze', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ token_id: token }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Hide loading indicator
+        loadingIndicator.style.display = 'none';
+        
+        if (data.error) {
+            resultsContainer.innerHTML = `<div class="error-message">${data.error}</div>`;
+            return;
+        }
+        
+        // Display results
+        const result = data.result;
+        resultsContainer.innerHTML = `
+            <div class="analysis-result-card">
+                <h3>${token.toUpperCase()} Analysis</h3>
+                <div class="result-item">
+                    <span class="label">Current Price:</span>
+                    <span class="value">$${result.current_price.toFixed(2)}</span>
+                </div>
+                <div class="result-item">
+                    <span class="label">Z-Score:</span>
+                    <span class="value ${getZScoreClass(result.metrics.z_score.value)}">${result.metrics.z_score.value.toFixed(2)}</span>
+                </div>
+                <div class="result-item">
+                    <span class="label">RSI:</span>
+                    <span class="value ${getRSIClass(result.metrics.rsi.value)}">${result.metrics.rsi.value.toFixed(2)}</span>
+                </div>
+                <div class="result-item">
+                    <span class="label">Bollinger %B:</span>
+                    <span class="value ${getBBClass(result.metrics.bollinger_bands.percent_b)}">${result.metrics.bollinger_bands.percent_b.toFixed(2)}</span>
+                </div>
+                <div class="result-summary">
+                    <h4>Interpretation:</h4>
+                    <p>${result.summary}</p>
+                </div>
+            </div>
+        `;
+    })
+    .catch(error => {
+        // Hide loading indicator
+        loadingIndicator.style.display = 'none';
+        
+        // Show error
+        resultsContainer.innerHTML = `<div class="error-message">Error: ${error.message}</div>`;
+    });
+}
+
+function getZScoreClass(value) {
+    if (value > 2) return 'high';
+    if (value < -2) return 'low';
+    return 'normal';
+}
+
+function getRSIClass(value) {
+    if (value > 70) return 'high';
+    if (value < 30) return 'low';
+    return 'normal';
+}
+
+function getBBClass(value) {
+    if (value > 1) return 'high';
+    if (value < 0) return 'low';
+    return 'normal';
+}
+
+function runTechnicalAnalysis() {
+    const tokenSelect = document.getElementById('technical-token');
+    const token = tokenSelect.value;
+    const timePeriod = document.getElementById('time-period').value;
+    const showZScore = document.getElementById('show-zscore').checked;
+    const showRSI = document.getElementById('show-rsi').checked;
+    const showBB = document.getElementById('show-bb').checked;
+    
+    const resultsContainer = document.getElementById('technical-analysis-results');
+    const loadingIndicator = document.getElementById('technical-analysis-loading');
+    
+    // Show loading indicator
+    resultsContainer.innerHTML = '';
+    loadingIndicator.style.display = 'flex';
+    
+    // Send request to server
+    fetch('/technical', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+            token_id: token,
+            time_period: timePeriod
+        }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Hide loading indicator
+        loadingIndicator.style.display = 'none';
+        
+        if (data.error) {
+            resultsContainer.innerHTML = `<div class="error-message">${data.error}</div>`;
+            return;
+        }
+        
+        // Create chart container
+        resultsContainer.innerHTML = `
+            <div class="chart-container">
+                <canvas id="technical-chart"></canvas>
+            </div>
+            <div class="indicators-summary">
+                <h4>Technical Indicators Summary</h4>
+                <div class="indicator-grid" id="indicator-summary"></div>
+            </div>
+        `;
+        
+        // Create chart (placeholder data since actual implementation would depend on API response)
+        createTechnicalChart();
+        
+        // Add indicator summary
+        const indicatorSummary = document.getElementById('indicator-summary');
+        indicatorSummary.innerHTML = `
+            <div class="indicator-item">
+                <span class="indicator-name">Z-Score:</span>
+                <span class="indicator-value ${getZScoreClass(data.indicators.z_score)}">${data.indicators.z_score.toFixed(2)}</span>
+            </div>
+            <div class="indicator-item">
+                <span class="indicator-name">RSI:</span>
+                <span class="indicator-value ${getRSIClass(data.indicators.rsi)}">${data.indicators.rsi.toFixed(2)}</span>
+            </div>
+            <div class="indicator-item">
+                <span class="indicator-name">Signal:</span>
+                <span class="indicator-value signal">${data.indicators.signal}</span>
+            </div>
+        `;
+    })
+    .catch(error => {
+        // Hide loading indicator
+        loadingIndicator.style.display = 'none';
+        
+        // Show error
+        resultsContainer.innerHTML = `<div class="error-message">Error: ${error.message}</div>`;
+    });
+}
+
+function createTechnicalChart() {
+    // Sample data - in a real implementation, this would use data from the API
+    const ctx = document.getElementById('technical-chart').getContext('2d');
+    
+    // Generate 30 days of sample data
+    const labels = Array.from({length: 30}, (_, i) => `Day ${i+1}`);
+    const priceData = Array.from({length: 30}, () => Math.random() * 5000 + 25000);
+    
+    // Create gradients
+    const priceGradient = ctx.createLinearGradient(0, 0, 0, 400);
+    priceGradient.addColorStop(0, 'rgba(75, 192, 192, 0.6)');
+    priceGradient.addColorStop(1, 'rgba(75, 192, 192, 0.1)');
+    
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Price (USD)',
+                data: priceData,
+                borderColor: 'rgb(75, 192, 192)',
+                backgroundColor: priceGradient,
+                borderWidth: 2,
+                fill: true,
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: false
+                }
+            }
+        }
+    });
+}
+
+function runWhaleAnalysis() {
+    const tokenSelect = document.getElementById('whale-token');
+    const token = tokenSelect.value;
+    const resultsContainer = document.getElementById('whale-analysis-results');
+    const loadingIndicator = document.getElementById('whale-analysis-loading');
+    
+    // Show loading indicator
+    resultsContainer.innerHTML = '';
+    loadingIndicator.style.display = 'flex';
+    
+    // Send request to server
+    fetch('/whale', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ token_id: token }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Hide loading indicator
+        loadingIndicator.style.display = 'none';
+        
+        if (data.error) {
+            resultsContainer.innerHTML = `<div class="error-message">${data.error}</div>`;
+            return;
+        }
+        
+        // Display results
+        resultsContainer.innerHTML = `
+            <div class="whale-result-card">
+                <h3>${token.toUpperCase()} Whale Analysis</h3>
+                <div class="risk-meter">
+                    <div class="risk-level ${getRiskClass(data.risk_score)}">
+                        <span class="risk-label">Risk Level: ${data.level}</span>
+                        <div class="risk-bar">
+                            <div class="risk-fill" style="width: ${data.risk_score}%;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="signals-list">
+                    <h4>Signals Detected:</h4>
+                    <ul id="whale-signals"></ul>
+                </div>
+            </div>
+        `;
+        
+        // Add signals
+        const signalsList = document.getElementById('whale-signals');
+        data.signals.forEach(signal => {
+            const li = document.createElement('li');
+            li.className = `signal-item ${signal.type}`;
+            li.textContent = signal.description;
+            signalsList.appendChild(li);
+        });
+    })
+    .catch(error => {
+        // Hide loading indicator
+        loadingIndicator.style.display = 'none';
+        
+        // Show error
+        resultsContainer.innerHTML = `<div class="error-message">Error: ${error.message}</div>`;
+    });
+}
+
+function getRiskClass(score) {
+    if (score > 75) return 'high-risk';
+    if (score > 50) return 'medium-risk';
+    if (score > 25) return 'low-risk';
+    return 'very-low-risk';
+}
+
+// Settings Functions
+function saveSettings() {
+    const apiKey = document.getElementById('api-key').value;
+    const apiProvider = document.getElementById('api-provider').value;
+    const enableSounds = document.getElementById('enable-sounds').checked;
+    const autostartChat = document.getElementById('autostart-chat').checked;
+    
+    // Here you would normally save these settings to the server
+    
+    // Show confirmation
+    showDialog('Settings', 'Settings saved successfully!');
+    
+    // Close settings window
+    closeWindow('settings-window');
+}
+
+function connectWallet() {
+    // Show a loading message
+    const walletDisplay = document.getElementById('wallet-address');
+    walletDisplay.textContent = 'Connecting...';
+    
+    // In a real implementation, this would connect to CDP wallet
+    setTimeout(() => {
+        walletDisplay.textContent = '0x1a2b...3c4d';
+    }, 2000);
+}
+
+// Error Dialog
+function showErrorDialog(message) {
+    document.getElementById('error-message').textContent = message;
+    document.getElementById('error-dialog-overlay').style.display = 'flex';
+    playSound('error-sound');
+}
+
+function closeErrorDialog() {
+    document.getElementById('error-dialog-overlay').style.display = 'none';
+}
+
+// Utility Functions
+function updateClock() {
+    const now = new Date();
+    let hours = now.getHours();
+    const minutes = now.getMinutes();
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    
+    hours = hours % 12;
+    hours = hours ? hours : 12; // the hour '0' should be '12'
+    
+    const timeString = hours + ':' + (minutes < 10 ? '0' + minutes : minutes) + ' ' + ampm;
+    document.getElementById('taskbar-time').textContent = timeString;
+}
+
+function playSound(soundId) {
+    // Check if sounds are enabled
+    const enableSounds = document.getElementById('enable-sounds') ? document.getElementById('enable-sounds').checked : true;
+    
+    if (enableSounds) {
+        const sound = document.getElementById(soundId);
+        if (sound && sound.play) {
+            sound.currentTime = 0;
+            sound.play().catch(e => {
+                // Autoplay might be blocked
+                console.log('Sound play failed:', e);
+            });
+        }
+    }
+}
+
+// Generic dialog
+function showDialog(title, message) {
+    // Create dialog if it doesn't exist
+    if (!document.getElementById('generic-dialog-overlay')) {
+        const dialogOverlay = document.createElement('div');
+        dialogOverlay.className = 'dialog-overlay';
+        dialogOverlay.id = 'generic-dialog-overlay';
+        
+        dialogOverlay.innerHTML = `
+            <div class="dialog" id="generic-dialog">
+                <div class="dialog-title-bar">
+                    <div class="dialog-title" id="generic-dialog-title">Message</div>
+                    <button class="dialog-close" onclick="closeGenericDialog()">✕</button>
+                </div>
+                <div class="dialog-content">
+                    <img src="static/img/w98_msg_info.png" alt="Info" class="dialog-icon">
+                    <div class="dialog-message" id="generic-dialog-message"></div>
+                </div>
+                <div class="dialog-buttons">
+                    <button class="win97-button" onclick="closeGenericDialog()">OK</button>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(dialogOverlay);
+    }
+    
+    // Set dialog content
+    document.getElementById('generic-dialog-title').textContent = title;
+    document.getElementById('generic-dialog-message').textContent = message;
+    document.getElementById('generic-dialog-overlay').style.display = 'flex';
+    
+    // Play notification sound
+    playSound('notify-sound');
+}
+
+function closeGenericDialog() {
+    document.getElementById('generic-dialog-overlay').style.display = 'none';
+}

@@ -1001,3 +1001,861 @@ body::after {
   border: 1px solid #ffd0d0;
   margin-top: 15px;
 }
+/* Windows 97 Style CSS */
+:root {
+    --win97-bg: #008080;
+    --win97-window-bg: #c0c0c0;
+    --win97-title-active: #000080;
+    --win97-title-inactive: #808080;
+    --win97-border: #dfdfdf #404040 #404040 #dfdfdf;
+    --win97-border-inner: #ffffff #808080 #808080 #ffffff;
+    --win97-text: #000000;
+    --win97-button-bg: #c0c0c0;
+    --win97-button-shadow: #ffffff #404040 #404040 #ffffff;
+    --win97-button-active: #808080 #ffffff #ffffff #808080;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    font-size: 12px;
+    background-color: var(--win97-bg);
+    color: var(--win97-text);
+    overflow: hidden;
+    user-select: none;
+}
+
+.desktop {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Desktop Icons */
+.desktop-icons {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+}
+
+.desktop-icon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 75px;
+    cursor: pointer;
+}
+
+.desktop-icon img {
+    width: 32px;
+    height: 32px;
+    margin-bottom: 5px;
+}
+
+.desktop-icon span {
+    color: white;
+    text-align: center;
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
+}
+
+/* Windows */
+.window {
+    position: absolute;
+    background-color: var(--win97-window-bg);
+    border: 2px solid;
+    border-color: var(--win97-border);
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    resize: both;
+    overflow: hidden;
+}
+
+.window.maximized {
+    width: 100vw !important;
+    height: calc(100vh - 28px) !important;
+    top: 0 !important;
+    left: 0 !important;
+    border-radius: 0;
+    resize: none;
+}
+
+.title-bar {
+    background-color: var(--win97-title-active);
+    color: white;
+    padding: 2px 3px;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: default;
+}
+
+.title-bar-text {
+    margin-left: 2px;
+}
+
+.title-bar-controls {
+    display: flex;
+    gap: 2px;
+}
+
+.title-bar-button {
+    width: 16px;
+    height: 14px;
+    background-color: var(--win97-button-bg);
+    border: 1px solid;
+    border-color: var(--win97-button-shadow);
+    color: black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    cursor: pointer;
+    padding: 0;
+}
+
+.title-bar-button:active {
+    border-color: var(--win97-button-active);
+}
+
+.window-content {
+    flex: 1;
+    padding: 10px;
+    overflow: auto;
+    background-color: var(--win97-window-bg);
+    border-top: 1px solid #808080;
+    border-left: 1px solid #808080;
+}
+
+.status-bar {
+    height: 20px;
+    padding: 2px;
+    background-color: var(--win97-window-bg);
+    border-top: 1px solid;
+    border-color: var(--win97-border-inner);
+    display: flex;
+    align-items: center;
+}
+
+.status-bar-field {
+    margin-right: 15px;
+    font-size: 11px;
+}
+
+/* Taskbar */
+.taskbar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 28px;
+    background-color: var(--win97-window-bg);
+    border-top: 1px solid white;
+    display: flex;
+    align-items: center;
+    padding: 0 2px;
+    z-index: 1000;
+}
+
+.start-button {
+    height: 22px;
+    padding: 1px 8px;
+    background-color: var(--win97-button-bg);
+    border: 2px solid;
+    border-color: var(--win97-button-shadow);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.start-button:active {
+    border-color: var(--win97-button-active);
+}
+
+.start-icon {
+    width: 16px;
+    height: 16px;
+}
+
+.taskbar-entries {
+    flex: 1;
+    display: flex;
+    margin-left: 6px;
+    gap: 3px;
+    overflow-x: hidden;
+}
+
+.taskbar-entry {
+    min-width: 120px;
+    max-width: 200px;
+    height: 22px;
+    background-color: var(--win97-button-bg);
+    border: 2px solid;
+    border-color: var(--win97-button-shadow);
+    padding: 1px 4px;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
+}
+
+.taskbar-entry:active {
+    border-color: var(--win97-button-active);
+}
+
+.taskbar-time {
+    padding: 0 10px;
+    border-left: 1px solid #808080;
+}
+
+/* Start Menu */
+.start-menu {
+    position: fixed;
+    bottom: 28px;
+    left: 0;
+    width: 200px;
+    background-color: var(--win97-window-bg);
+    border: 2px solid;
+    border-color: var(--win97-border);
+    display: none;
+    z-index: 1001;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.start-menu-item {
+    padding: 5px 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: black;
+}
+
+.start-menu-item:hover {
+    background-color: var(--win97-title-active);
+    color: white;
+}
+
+.start-menu-item .icon {
+    width: 24px;
+    height: 24px;
+}
+
+/* Chat Specific Styles */
+.chat-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    border: 2px solid;
+    border-color: var(--win97-border-inner);
+    background-color: white;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.chat-message {
+    max-width: 90%;
+}
+
+.chat-message.user {
+    align-self: flex-end;
+}
+
+.chat-message.system {
+    align-self: flex-start;
+}
+
+.message-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.bot-avatar {
+    width: 24px;
+    height: 24px;
+}
+
+.message-text {
+    background-color: #f0f0f0;
+    border: 1px solid #d0d0d0;
+    padding: 8px 12px;
+    border-radius: 4px;
+}
+
+.chat-message.user .message-text {
+    background-color: #e1f3fb;
+}
+
+.chat-message.system.thinking .message-text {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.chat-message.system.error .message-text {
+    background-color: #ffdddd;
+}
+
+.chat-input-container {
+    margin-top: 10px;
+    display: flex;
+    gap: 5px;
+}
+
+#chat-input {
+    flex: 1;
+    resize: none;
+    padding: 8px;
+    border: 2px solid;
+    border-color: var(--win97-border-inner);
+    background-color: white;
+    font-family: inherit;
+}
+
+.send-button {
+    width: 60px;
+    background-color: var(--win97-button-bg);
+    border: 2px solid;
+    border-color: var(--win97-button-shadow);
+    cursor: pointer;
+}
+
+.send-button:active {
+    border-color: var(--win97-button-active);
+}
+
+/* Analysis Styles */
+.tab-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.tabs {
+    display: flex;
+    background-color: var(--win97-window-bg);
+    border-bottom: 1px solid #808080;
+}
+
+.tab-button {
+    padding: 5px 10px;
+    background-color: var(--win97-button-bg);
+    border: 1px solid;
+    border-color: var(--win97-button-shadow);
+    margin-right: 2px;
+    cursor: pointer;
+}
+
+.tab-button.active {
+    background-color: #f0f0f0;
+    border-bottom-color: #f0f0f0;
+}
+
+.tab-content {
+    flex: 1;
+    overflow-y: auto;
+    background-color: #f0f0f0;
+    border-top: none;
+}
+
+.tab-pane {
+    display: none;
+    padding: 15px;
+    height: 100%;
+}
+
+.tab-pane.active {
+    display: block;
+}
+
+/* Analysis Forms */
+.analysis-form {
+    background-color: var(--win97-window-bg);
+    padding: 10px;
+    border: 2px solid;
+    border-color: var(--win97-border-inner);
+    margin-bottom: 15px;
+}
+
+.form-row {
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+}
+
+.form-row label {
+    width: 140px;
+    margin-right: 10px;
+}
+
+.win97-select, .win97-input {
+    flex: 1;
+    padding: 3px;
+    border: 2px solid;
+    border-color: var(--win97-border-inner);
+    background-color: white;
+}
+
+.checkbox-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.checkbox-row label {
+    width: auto;
+    margin-right: 0;
+}
+
+.win97-button {
+    padding: 5px 15px;
+    background-color: var(--win97-button-bg);
+    border: 2px solid;
+    border-color: var(--win97-button-shadow);
+    cursor: pointer;
+}
+
+.win97-button:active {
+    border-color: var(--win97-button-active);
+}
+
+.small-button {
+    padding: 2px 8px;
+    font-size: 11px;
+}
+
+/* Analysis Results */
+.analysis-results {
+    background-color: white;
+    border: 2px solid;
+    border-color: var(--win97-border-inner);
+    padding: 10px;
+    flex: 1;
+    overflow-y: auto;
+    min-height: 200px;
+}
+
+.placeholder-message {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    color: #707070;
+    text-align: center;
+}
+
+.loading-container {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    gap: 15px;
+}
+
+.win95-loading {
+    width: 16px;
+    height: 16px;
+    border: 2px solid #000;
+    border-top: 2px solid transparent;
+    border-radius: 50%;
+    animation: win95-spin 1s linear infinite;
+}
+
+@keyframes win95-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.analysis-result-card {
+    padding: 10px;
+    background-color: #f5f5f5;
+    border: 1px solid #d0d0d0;
+}
+
+.analysis-result-card h3 {
+    margin-bottom: 10px;
+    border-bottom: 1px solid #d0d0d0;
+    padding-bottom: 5px;
+}
+
+.result-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+    padding: 5px;
+    background-color: white;
+    border: 1px solid #e0e0e0;
+}
+
+.value.high {
+    color: red;
+    font-weight: bold;
+}
+
+.value.low {
+    color: blue;
+    font-weight: bold;
+}
+
+.value.normal {
+    color: green;
+}
+
+.result-summary {
+    margin-top: 15px;
+    padding: 10px;
+    background-color: white;
+    border: 1px solid #e0e0e0;
+}
+
+.chart-container {
+    height: 200px;
+    margin-bottom: 15px;
+}
+
+.indicators-summary {
+    padding: 10px;
+    background-color: #f5f5f5;
+    border: 1px solid #d0d0d0;
+}
+
+.indicator-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.indicator-item {
+    background-color: white;
+    padding: 8px;
+    border: 1px solid #e0e0e0;
+    display: flex;
+    flex-direction: column;
+}
+
+.indicator-value {
+    font-weight: bold;
+    margin-top: 5px;
+}
+
+.indicator-value.signal {
+    color: purple;
+}
+
+/* Whale Analysis */
+.whale-result-card {
+    padding: 10px;
+}
+
+.risk-meter {
+    margin: 15px 0;
+}
+
+.risk-level {
+    padding: 10px;
+    border: 1px solid #d0d0d0;
+    background-color: white;
+}
+
+.risk-label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.risk-bar {
+    height: 20px;
+    background-color: #e0e0e0;
+    position: relative;
+}
+
+.risk-fill {
+    height: 100%;
+    background-color: green;
+    transition: width 0.5s ease-in-out;
+}
+
+.high-risk .risk-fill {
+    background-color: red;
+}
+
+.medium-risk .risk-fill {
+    background-color: orange;
+}
+
+.low-risk .risk-fill {
+    background-color: yellow;
+}
+
+.signals-list {
+    margin-top: 15px;
+}
+
+.signal-item {
+    padding: 8px;
+    margin-bottom: 5px;
+    background-color: white;
+    border: 1px solid #e0e0e0;
+}
+
+.signal-item.positive {
+    border-left: 5px solid green;
+}
+
+.signal-item.negative {
+    border-left: 5px solid red;
+}
+
+.signal-item.neutral {
+    border-left: 5px solid orange;
+}
+
+/* Settings Styles */
+.settings-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.settings-group {
+    margin-bottom: 20px;
+}
+
+.settings-group h3 {
+    margin-bottom: 10px;
+    border-bottom: 1px solid #808080;
+    padding-bottom: 3px;
+}
+
+.settings-item {
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+}
+
+.settings-item label {
+    width: 140px;
+    margin-right: 10px;
+}
+
+.settings-item input[type="text"],
+.settings-item input[type="password"] {
+    flex: 1;
+    padding: 3px;
+    border: 2px solid;
+    border-color: var(--win97-border-inner);
+    background-color: white;
+}
+
+.checkbox-setting {
+    display: flex;
+    align-items: center;
+}
+
+.checkbox-setting label {
+    width: auto;
+    margin-left: 5px;
+}
+
+.wallet-display {
+    background-color: white;
+    padding: 8px;
+    border: 2px solid;
+    border-color: var(--win97-border-inner);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.settings-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: auto;
+}
+
+/* Help Styles */
+.help-tabs {
+    display: flex;
+    height: 100%;
+}
+
+.help-sidebar {
+    width: 150px;
+    background-color: var(--win97-window-bg);
+    border-right: 2px solid;
+    border-color: var(--win97-border-inner);
+    padding: 5px 0;
+}
+
+.help-sidebar-item {
+    padding: 8px 10px;
+    cursor: pointer;
+}
+
+.help-sidebar-item.active {
+    background-color: var(--win97-title-active);
+    color: white;
+}
+
+.help-content {
+    flex: 1;
+    padding: 10px;
+    overflow-y: auto;
+}
+
+.help-tab-content {
+    display: none;
+}
+
+.help-tab-content.active {
+    display: block;
+}
+
+.help-tab-content h2 {
+    margin-bottom: 15px;
+    border-bottom: 1px solid #808080;
+    padding-bottom: 5px;
+}
+
+.help-tab-content p {
+    margin-bottom: 10px;
+    line-height: 1.5;
+}
+
+.help-tab-content ul, 
+.help-tab-content ol {
+    margin-bottom: 15px;
+    margin-left: 20px;
+}
+
+.help-tab-content li {
+    margin-bottom: 5px;
+}
+
+.command-list, .tool-list {
+    margin-top: 15px;
+}
+
+.command-item, .tool-item {
+    margin-bottom: 10px;
+    padding: 8px;
+    background-color: #f5f5f5;
+    border: 1px solid #d0d0d0;
+}
+
+.command-name, .tool-name {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.about-logo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 30px;
+}
+
+.about-logo img {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 10px;
+}
+
+/* Dialog */
+.dialog-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.3);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.dialog {
+    width: 300px;
+    background-color: var(--win97-window-bg);
+    border: 2px solid;
+    border-color: var(--win97-border);
+    box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.3);
+}
+
+.dialog-title-bar {
+    background-color: var(--win97-title-active);
+    color: white;
+    padding: 2px 3px;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dialog-close {
+    width: 16px;
+    height: 14px;
+    background-color: var(--win97-button-bg);
+    border: 1px solid;
+    border-color: var(--win97-button-shadow);
+    color: black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    cursor: pointer;
+    padding: 0;
+}
+
+.dialog-content {
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.dialog-icon {
+    width: 32px;
+    height: 32px;
+}
+
+.dialog-buttons {
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+/* Error Message */
+.error-message {
+    color: red;
+    padding: 10px;
+    border: 1px solid red;
+    background-color: #ffeeee;
+    margin-bottom: 10px;
+}
