@@ -135,5 +135,6 @@ def handler(request, context):
         return app.full_dispatch_request()
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5050))
-    app.run(host="0.0.0.0", port=port)
+    port = int(os.environ.get("PORT", 8080))
+    app.run(host="0.0.0.0", port=port, debug=True)
+    print(f"Server running at http://0.0.0.0:{port}")

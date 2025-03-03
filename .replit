@@ -13,7 +13,7 @@ packageSearch = true
 guessImports = true
 
 [nix]
-channel = "stable-23_11"
+channel = "stable-24_05"
 
 [deployment]
 run = ["sh", "-c", "python server.py"]
@@ -23,4 +23,15 @@ deploymentTarget = "cloudrun"
 [http_service]
 internal_port = 8080
 external_port = 80
-url = "https://${REPL_SLUG}.${REPL_OWNER}.repl.co" 
+url = "https://${REPL_SLUG}.${REPL_OWNER}.repl.co"
+
+[workflows]
+runButton = "Run Server"
+
+[[workflows.workflow]]
+name = "Run Server"
+author = 12213644
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python server.py"
