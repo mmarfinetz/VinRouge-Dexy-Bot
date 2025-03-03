@@ -5,7 +5,7 @@ from flask import Flask, request, jsonify, render_template, send_from_directory
 # Import the agent initialization from chatbot.py
 from chatbot import initialize_agent, HumanMessage
 
-app = Flask(__name__, static_folder='static', template_folder='.')
+from api.index import app
 
 # Initialize AgentKit
 agent_executor, config = initialize_agent()
@@ -135,5 +135,6 @@ def handler(request, context):
         return app.full_dispatch_request()
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5050))
-    app.run(host="0.0.0.0", port=port)
+    # Bind to 0.0.0.0 to make the server accessible from outside
+    # Use port 8080 as specified in the .replit configuration
+    app.run(host='0.0.0.0', port=8080, debug=False)
