@@ -24,3 +24,18 @@ deploymentTarget = "cloudrun"
 internal_port = 8080
 external_port = 80
 url = "https://${REPL_SLUG}.${REPL_OWNER}.repl.co" 
+
+[[ports]]
+localPort = 8080
+externalPort = 80
+
+[workflows]
+runButton = "Run"
+
+[[workflows.workflow]]
+name = "Run"
+author = 12213644
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python3 -m pip install --user -r requirements.txt && python server.py"
