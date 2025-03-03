@@ -1,0 +1,27 @@
+  Using cached SQLAlchemy-2.0.38-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (9.6 kB)
+Collecting PyYAML>=5.3 (from langchain-community==0.3.18->-r requirements.txt (line 6))
+  Using cached PyYAML-6.0.2-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (2.1 kB)
+Collecting aiohttp<4.0.0,>=3.8.3 (from langchain-community==0.3.18->-r requirements.txt (line 6))
+  Using cached aiohttp-3.11.13-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (7.7 kB)
+Collecting tenacity!=8.4.0,<10,>=8.1.0 (from langchain-community==0.3.18->-r requirements.txt (line 6))
+  Using cached tenacity-9.0.0-py3-none-any.whl.metadata (1.2 kB)
+Collecting dataclasses-json<0.7,>=0.5.7 (from langchain-community==0.3.18->-r requirements.txt (line 6))
+  Using cached dataclasses_json-0.6.7-py3-none-any.whl.metadata (25 kB)
+Collecting pydantic-settings<3.0.0,>=2.4.0 (from langchain-community==0.3.18->-r requirements.txt (line 6))
+  Using cached pydantic_settings-2.8.1-py3-none-any.whl.metadata (3.5 kB)
+Collecting langsmith<0.4,>=0.1.125 (from langchain-community==0.3.18->-r requirements.txt (line 6))
+  Using cached langsmith-0.3.11-py3-none-any.whl.metadata (14 kB)
+Collecting httpx-sse<1.0.0,>=0.4.0 (from langchain-community==0.3.18->-r requirements.txt (line 6))
+  Using cached httpx_sse-0.4.0-py3-none-any.whl.metadata (9.0 kB)
+INFO: pip is looking at multiple versions of langchain-community to determine which version is compatible with other requirements. This could take a while.
+ERROR: Cannot install -r requirements.txt (line 6) and numpy==1.21.6 because these package versions have conflicting dependencies.
+
+The conflict is caused by:
+    The user requested numpy==1.21.6
+    langchain-community 0.3.18 depends on numpy<2 and >=1.26.4; python_version < "3.12"
+
+To fix this you could try to:
+1. loosen the range of package versions you've specified
+2. remove package versions to allow pip attempt to solve the dependency conflict
+
+ERROR: ResolutionImpossible: for help visit https://pip.pypa.io/en/latest/topics/dependency-resolution/#dealing-with-dependency-conflicts
