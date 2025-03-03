@@ -73,12 +73,12 @@ def query():
         data = request.json
         if not data:
             return jsonify({"response": "No data received. Please send a message."}), 200
-            
+
         user_message = data.get("message", "")
-        
+
         if not user_message:
             return jsonify({"response": "I didn't receive a message. What would you like to know?"}), 200
-        
+
         # For now, provide a simple response
         response = {
             "response": "I understand you're asking about: " + user_message + "\nI'm currently in test mode, but I can help you analyze cryptocurrencies and interact with blockchain using CDP AgentKit. What would you like to know?"
@@ -100,19 +100,19 @@ def analyze():
         response.headers.add('Access-Control-Allow-Headers', 'Content-Type, Authorization')
         response.headers.add('Access-Control-Allow-Methods', 'POST')
         return response
-        
+
     try:
         data = request.json
         if not data:
             data = {}
-            
+
         token_id = data.get("token_id", "bitcoin")
         logger.info(f"Processing analyze request for token: {token_id}")
-        
+
         # Try to combine both analysis types into one comprehensive report
         technical_data = None
         whale_data = None
-        
+
         # Get technical analysis data
         try:
             try:
@@ -122,12 +122,12 @@ def analyze():
             except ImportError as e:
                 logger.error(f"Error importing numpy or pandas: {e}")
                 raise ValueError(f"Required dependencies missing: {e}")
-                
+
             # Now try to import the mean reversion service
             from tools.mean_reversion.core.indicators import MeanReversionService
             service = MeanReversionService(api_provider="coinapi")
             analysis_result = service.get_all_indicators(token_id)
-            
+
             technical_data = {
                 "current_price": analysis_result["current_price"],
                 "z_score": analysis_result["indicators"]["z_score"]["value"],
@@ -153,12 +153,12 @@ def analyze():
                 "bb_interpretation": "Within normal range",
                 "signal": "NEUTRAL"
             }
-            
+
         # Get whale analysis data
         try:
             from tools.whalesignal.whale_dominance import generate_risk_signals
             risk_result = generate_risk_signals()
-            
+
             whale_data = {
                 "risk_score": risk_result["risk_score"] * 20 if risk_result["risk_score"] <= 5 else 100,  # Scale to 0-100
                 "level": risk_result["level"].replace("🚨", "").replace("⚠️", "").replace("🟢", "").strip(),
@@ -176,7 +176,7 @@ def analyze():
                     "Historical volatility above average"
                 ]
             }
-            
+
         # Combine the data into one integrated result
         result = {
             "token": token_id,
@@ -197,7 +197,7 @@ def analyze():
             "signal": technical_data["signal"],
             "overall_risk": "HIGH" if whale_data["risk_score"] > 70 else "MEDIUM" if whale_data["risk_score"] > 30 else "LOW"
         }
-        
+
         return jsonify({"result": result})
     except Exception as e:
         error_msg = f"Error in analyze endpoint: {str(e)}"
@@ -214,16 +214,16 @@ def technical():
         response.headers.add('Access-Control-Allow-Headers', 'Content-Type, Authorization')
         response.headers.add('Access-Control-Allow-Methods', 'POST')
         return response
-        
+
     try:
         data = request.json
         if not data:
             data = {}
-            
+
         token_id = data.get("token_id", "bitcoin")
         days = int(data.get("days", 30))
         logger.info(f"Processing technical request for token: {token_id}, days: {days}")
-        
+
         # Import the Mean Reversion Service here
         try:
             try:
@@ -233,16 +233,16 @@ def technical():
             except ImportError as e:
                 logger.error(f"Error importing numpy or pandas: {e}")
                 raise ValueError(f"Required dependencies missing: {e}")
-                
+
             # Now try to import the mean reversion service
             from tools.mean_reversion.core.indicators import MeanReversionService
-            
+
             # Initialize the service with default settings (CoinAPI for OHLC data)
             service = MeanReversionService(api_provider="coinapi")
-            
+
             # Get all indicators for the specified token
             analysis_result = service.get_all_indicators(token_id, window=min(days, 20))
-            
+
             # Format the response to match the expected structure
             result = {
                 "token": token_id,
@@ -268,9 +268,9 @@ def technical():
                          "BEARISH" if analysis_result["indicators"]["z_score"]["interpretation"].startswith("POTENTIAL DOWNWARD") else
                          "NEUTRAL"
             }
-            
+
             return jsonify({"indicators": result})
-            
+
         except Exception as import_error:
             print(f"Error importing or using Mean Reversion Service: {str(import_error)}")
             # If there's an error with the service, fall back to mock data
@@ -292,7 +292,7 @@ def technical():
                 "note": "This is simulated data for demonstration purposes."
             }
             return jsonify({"indicators": mock_data})
-            
+
     except Exception as e:
         error_msg = f"Error in technical endpoint: {str(e)}"
         logger.error(error_msg)
@@ -308,21 +308,21 @@ def whale():
         response.headers.add('Access-Control-Allow-Headers', 'Content-Type, Authorization')
         response.headers.add('Access-Control-Allow-Methods', 'POST')
         return response
-        
+
     try:
         data = request.json
         if not data:
             data = {}
-            
+
         token_id = data.get("token_id", "bitcoin")
-        
+
         # Try to use the whale_dominance module
         try:
             from tools.whalesignal.whale_dominance import generate_risk_signals
-            
+
             # Generate risk signals
             risk_result = generate_risk_signals()
-            
+
             # Format the response
             result = {
                 "token_id": token_id,
@@ -330,9 +330,9 @@ def whale():
                 "level": risk_result["level"].replace("🚨", "").replace("⚠️", "").replace("🟢", "").strip(),
                 "signals": risk_result["signals"]
             }
-            
+
             return jsonify(result)
-            
+
         except Exception as import_error:
             print(f"Error importing or using Whale Signal: {str(import_error)}")
             # If there's an error with the module, fall back to mock data
@@ -347,9 +347,9 @@ def whale():
                 ],
                 "note": "This is simulated data for demonstration purposes."
             }
-            
+
             return jsonify(mock_data)
-            
+
     except Exception as e:
         error_msg = f"Error in whale endpoint: {str(e)}"
         logger.error(error_msg)
@@ -373,7 +373,7 @@ def wallet():
         response.headers.add('Access-Control-Allow-Headers', 'Content-Type, Authorization')
         response.headers.add('Access-Control-Allow-Methods', 'GET')
         return response
-    
+
     try:    
         return jsonify({
             "wallet": {
@@ -413,7 +413,7 @@ def catch_all(path):
         response.headers.add('Access-Control-Allow-Headers', 'Content-Type, Authorization')
         response.headers.add('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS')
         return response
-        
+
     try:
         with app.request_context(request.environ):
             return app.full_dispatch_request()
@@ -438,14 +438,14 @@ def handler(event, context):
         path = event.get('path', '/')
         headers = event.get('headers', {})
         body = event.get('body', '')
-        
+
         # Add CORS headers for all responses
         cors_headers = {
             'Access-Control-Allow-Origin': '*',
             'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
             'Access-Control-Allow-Headers': 'Content-Type, Authorization'
         }
-        
+
         # Handle preflight OPTIONS request directly
         if method == 'OPTIONS':
             return {
@@ -456,14 +456,14 @@ def handler(event, context):
                 },
                 'body': '{}'
             }
-        
+
         # Convert body to dict if it's a JSON string
         if isinstance(body, str) and body:
             try:
                 body = json.loads(body)
             except:
                 body = {}
-        
+
         # Create a Flask request context
         with app.test_request_context(
             path=path,
@@ -474,16 +474,16 @@ def handler(event, context):
             # Process the request
             try:
                 response = app.full_dispatch_request()
-                
+
                 # Extract response data
                 status_code = response.status_code
                 response_headers = dict(response.headers)
                 response_body = response.get_data(as_text=True)
-                
+
                 # Add CORS headers to every response
                 for key, value in cors_headers.items():
                     response_headers[key] = value
-                
+
                 # Return response in the format expected by Vercel
                 return {
                     'statusCode': status_code,
@@ -523,3 +523,7 @@ def handler(event, context):
                 'message': "The server encountered an error processing your request"
             })
         }
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 8080))
+    app.run(host="0.0.0.0", port=port, debug=True)
